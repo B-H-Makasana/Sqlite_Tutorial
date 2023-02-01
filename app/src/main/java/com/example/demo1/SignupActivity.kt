@@ -37,21 +37,13 @@ class MainActivity : ComponentActivity() {
     private val TAG = "MainActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        actionBar!!.title="Register"
+
         setContent {
             Demo1Theme {
 
 
-                Scaffold(
-                    topBar = {
-                        TopAppBar(
-
-                            title = { Text("Sign Up") },
-                            backgroundColor = Color(R.color.colorPrimary)
-                        )
-                    },
-                    content = { Content() }
-
-                )
+                Content()
             }
         }
 
@@ -83,8 +75,8 @@ fun Content() {
 
         EditText(title = "First Name", KeyboardType.Text, firstName)
         EditText(title = "Last Name", KeyboardType.Text, lastName)
-        EditText(title = "Age", KeyboardType.Number, age)
-        EditText(title = "Email", Email, email)
+        EditText(title = "Age", KeyboardType.Decimal, age)
+        EditText(title = "Email", KeyboardType.Email, email)
         DatePicker(mDate)
         SimpleRadioButtonComponent(selectedOption)
         Switcher()
@@ -121,7 +113,7 @@ fun EditText(title: String, keyboardType: KeyboardType, input: MutableState<Stri
         { Text(title) },
 
         keyboardOptions = KeyboardOptions(
-            keyboardType = keyboardType
+            keyboardType = keyboardType,
         ),
         textStyle = TextStyle(color = Color.Gray)
 
@@ -161,8 +153,7 @@ fun DatePicker(mDate: MutableState<String>) {
 
     Button(
         modifier = Modifier
-            .padding(vertical = 8.dp)
-            .background(color = Color.White),
+            .padding(vertical = 8.dp),
         onClick = {
             mDatePickerDialog.show()
         },
@@ -293,6 +284,7 @@ fun SignUpButton(
                 "^(?=.*[a-z])(?=.*[A-Z])" + "(?=.*[@#$%^&+=])" + "(?=\\S+$).{8,20}$"
 
             val name = "^[a-zA-Z]+$"
+            val rgAge ="^[0-9]*$"
 
 
             if (firstName.value == "" || lastName.value == "" || age.value == "" || email.value == "" || date.value == "" || gender.value == "") {
@@ -303,7 +295,7 @@ fun SignUpButton(
                 Toast.makeText(mContext, "Please Enter valid password", Toast.LENGTH_LONG).show()
             } else if (password.value != confirmPassword.value) {
                 Toast.makeText(mContext, "Password not matches", Toast.LENGTH_LONG).show()
-            } else if (age.value.length > 3 && age.value.toInt() <= 0) {
+            } else if (age.value.length > 3 || !age.value.matches(rgAge.toRegex()) || age.value.toInt() <= 0) {
                 Toast.makeText(mContext, "Please Enter valid Age", Toast.LENGTH_LONG).show()
 
             } else if (!(firstName.value.matches(name.toRegex())) || !(lastName.value.matches(name.toRegex()))) {
@@ -315,9 +307,9 @@ fun SignUpButton(
                 val db = DBHelper(mContext)
                 GlobalScope.launch {
                     withContext(Dispatchers.IO) {
-                        var cursor = db.getUser(email.value)
+                        val cursor = db.getUser(email.value)
                         if (cursor.count() > 1) {
-                            Log.d("TAG", "user esistx")
+                            Log.d("TAG", "user esist")
                             isUserExists = true
                         } else {
 
@@ -342,14 +334,13 @@ fun SignUpButton(
                             Toast.makeText(mContext, "User Already Exists", Toast.LENGTH_LONG)
                                 .show()
 
-                        } else {
-
+                        }
+                        else {
 
                             val intent = Intent(mContext, DetailsActivity::class.java).apply {
                                 putExtra("Email", email.value)
                             }
                             startActivity(mContext, intent, null)
-                            // at last, clearing edit texts
                             firstName.value = ""
                             lastName.value = ""
                             age.value = ""

@@ -10,12 +10,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontLoadingStrategy.Companion.Async
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.demo1.ui.theme.Demo1Theme
+import kotlinx.coroutines.*
 
 class DetailsActivity : ComponentActivity() {
     private  val TAG = "DetailsActivity"
@@ -25,25 +29,12 @@ class DetailsActivity : ComponentActivity() {
         val email = intent.getStringExtra("Email")
         Log.d(TAG, "onCreate() called with: savedInstanceState = $email")
 
-
+         actionBar!!.title="Details"
             setContent {
             Demo1Theme() {
 
 
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-
-                    ) {
-                    Scaffold(
-                        topBar = {
-                            TopAppBar(
-                                title = { Text("Details") },
-                            )
-                        },
-                        content = { Showdetails(email!!) }
-
-                    )
-                }
+                Showdetails(email = email!!)
             }
         }
     }
@@ -51,17 +42,28 @@ class DetailsActivity : ComponentActivity() {
     @SuppressLint("Range", "CoroutineCreationDuringComposition")
     @Composable
     private fun Showdetails(email:String) {
-        var text:String?=null
-        var mContext= LocalContext.current
+        var text= rememberSaveable {
+            mutableStateOf("")
+        }
+        val mContext= LocalContext.current
 
 
-             val db = DBHelper(mContext)
+
+             GlobalScope.launch {
+                 val db = DBHelper(mContext)
+
+                 withContext(Dispatchers.IO) {
+                     text.value = db.getUser(email)
+                 }
+                 Log.d(TAG, "Showdetails: " + text)
 
 
-              text = db.getUser(email)
+                 withContext(Dispatchers.Main) {
+                     Log.d(TAG, "withContext main")
+                 }
 
-
-        text?.let {
+             }
+        Log.d(TAG, "outofGlobalScope")
             Card(
                 elevation = 4.dp,
                 backgroundColor = Color(R.color.transparent),
@@ -69,40 +71,16 @@ class DetailsActivity : ComponentActivity() {
             ){
 
                 Text(
-                    text = it, modifier = Modifier
+                    text = text.value, modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                 )
 
-            }
+
         }
 
 
 
-//        GlobalScope.launch{
-//            withContext(Dispatchers.IO){
-//                val db = DBHelper(mContext)
-//            }
-//
-//           withContext(Dispatchers.Main){
-//                delay(1000)
-//            }
-//            }
-//        text?.let {
-//            Card(
-//                elevation = 4.dp,
-//                backgroundColor = Color(R.color.transparent),
-//                modifier = Modifier.padding(16.dp)
-//            ){
-//
-//                Text(
-//                    text = it, modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(16.dp)
-//                )
-//
-//            }
-//        }
     }
 
     @Preview(showBackground = true)

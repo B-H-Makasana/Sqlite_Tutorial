@@ -26,33 +26,21 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import com.example.demo1.ui.theme.Demo1Theme
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        actionBar!!.title="Login"
+
         setContent {
             Demo1Theme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
 
-                    ) {
-                    Scaffold(
-                        topBar = {
-                            TopAppBar(
-                                title = { Text("Login") },
-                            )
-                        },
-                        content = { Login() }
-
-                    )
-                }
-
-
+               Login()
             }
         }
     }
@@ -103,8 +91,7 @@ class LoginActivity : ComponentActivity() {
                         .show()
                 } else {
                     var mlogin: Boolean
-
-                    GlobalScope.launch {
+                    lifecycleScope.launch {
                         withContext(Dispatchers.IO) {
                             val db = DBHelper(mContext)
 

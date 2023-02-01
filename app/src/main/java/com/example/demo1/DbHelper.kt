@@ -7,10 +7,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 
 class DBHelper(context: Context) :
      SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -60,44 +57,38 @@ class DBHelper(context: Context) :
 
 
    @SuppressLint("Range")
-    fun getUser(email:String): String{
+  suspend  fun getUser(mEmail:String): String{
 
 
-        lateinit var text:String
+        var text:String=""
+         var cursor:Cursor
         val db = this.readableDatabase
 
-        var job=GlobalScope.launch(Dispatchers.IO) {
-            var selectionArgs = listOf<String>(email)
+            val selectionArgs = listOf<String>(mEmail)
 
-            var cursor = db.rawQuery(
+             cursor =  db.rawQuery(
                 "SELECT * FROM $TABLE_NAME WHERE $EMAIL= ?",
                 selectionArgs.toTypedArray()
             )
-            cursor?.let {
-                Log.d("LoginDetail", "Showdetails: " + it.toString())
-                if (cursor!!.moveToFirst()) {
-                    var fname = cursor.getString(it.getColumnIndex(FNAME))
-                    var lname = it.getString(it.getColumnIndex(LNAME))
-                    var email = it.getString(it.getColumnIndex(EMAIL))
 
-                    var age = it.getInt(it.getColumnIndex(AGE))
-                    var gender = it.getString(it.getColumnIndex(GENDER))
-                    var date = it.getString(it.getColumnIndex(BDATE))
 
-                    text =
-                        "Name : " + fname + " " + lname + "\n" + "Email : " + email + "\n" + "Age : " + age + "\n" + "Gender : " + gender + "\n" + "Birth Date : " + date
-                    Log.d(
-                        "DetailsActivity",
-                        "Showdetails() called with: email = $email text is $text"
-                    )
-                    it.close()
 
-                }
-            }
-        }
-       runBlocking {
-           job.join()
+
+           if (cursor.moveToFirst()) {
+               val fname = cursor.getString(cursor.getColumnIndex(FNAME))
+               val lname = cursor.getString(cursor.getColumnIndex(LNAME))
+               val email = cursor.getString(cursor.getColumnIndex(EMAIL))
+               val age = cursor.getInt(cursor.getColumnIndex(AGE))
+               val gender = cursor.getString(cursor.getColumnIndex(GENDER))
+               val date = cursor.getString(cursor.getColumnIndex(BDATE))
+
+               text = "Name : " + fname + " " + lname + "\n" + "Email : " + email + "\n" + "Age : " + age + "\n" + "Gender : " + gender + "\n" + "Birth Date : " + date
+               cursor.close()
+
+
        }
+
+
 
        return text
 
