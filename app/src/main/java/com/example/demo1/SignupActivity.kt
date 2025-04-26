@@ -46,7 +46,6 @@ class MainActivity : ComponentActivity() {
                 Content()
             }
         }
-
     }
 
 }
@@ -365,7 +364,6 @@ fun SignUpButton(
 
 
 }
-
 
 @Preview(showBackground = true)
 @Composable

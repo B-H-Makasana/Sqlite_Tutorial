@@ -6,7 +6,6 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log
 import kotlinx.coroutines.*
 
 class DBHelper(context: Context) :
@@ -25,18 +24,13 @@ class DBHelper(context: Context) :
         db.execSQL(query)
     }
 
-
-
-
     override fun onUpgrade(db: SQLiteDatabase, p1: Int, p2: Int) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME)
         onCreate(db)
     }
 
-   suspend fun addUser(user: User){
-
+    fun addUser(user: User){
         val values = ContentValues()
-
 
         values.put(FNAME, user.firstName)
         values.put(LNAME, user.lastName)
@@ -46,12 +40,8 @@ class DBHelper(context: Context) :
         values.put(GENDER,user.gender)
         values.put(PASSWORD,user.password)
 
-
         val db = this.writableDatabase
-
         db.insert(TABLE_NAME, null, values)
-
-
         db.close()
     }
 
@@ -59,9 +49,8 @@ class DBHelper(context: Context) :
    @SuppressLint("Range")
   suspend  fun getUser(mEmail:String): String{
 
-
         var text:String=""
-         var cursor:Cursor
+        var cursor:Cursor
         val db = this.readableDatabase
 
             val selectionArgs = listOf<String>(mEmail)
