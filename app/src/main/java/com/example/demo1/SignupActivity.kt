@@ -37,19 +37,14 @@ class MainActivity : ComponentActivity() {
     private val TAG = "MainActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        actionBar!!.title="Register"
-
+        actionBar!!.title = "Register"
         setContent {
             Demo1Theme {
-
-
                 Content()
             }
         }
     }
-
 }
-
 
 @Composable
 fun Content() {
@@ -62,15 +57,11 @@ fun Content() {
     val mDate = remember { mutableStateOf("") }
     val selectedOption = remember { mutableStateOf("") }
 
-
-
-
     Column(
         Modifier
             .verticalScroll(rememberScrollState())
             .padding(16.dp), verticalArrangement = Arrangement.SpaceAround
     ) {
-
 
         EditText(title = "First Name", KeyboardType.Text, firstName)
         EditText(title = "Last Name", KeyboardType.Text, lastName)
@@ -92,33 +83,25 @@ fun Content() {
             confirmPassword
         )
         LoginText()
-
     }
 }
 
 
 @Composable
 fun EditText(title: String, keyboardType: KeyboardType, input: MutableState<String>) {
-
-
     OutlinedTextField(
         value = input.value,
         onValueChange = { input.value = it },
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-
         label =
         { Text(title) },
-
         keyboardOptions = KeyboardOptions(
             keyboardType = keyboardType,
         ),
         textStyle = TextStyle(color = Color.Gray)
-
     )
-
-
 }
 
 @Composable
@@ -137,7 +120,6 @@ fun DatePicker(mDate: MutableState<String>) {
 
     mCalendar.time = Date()
 
-
     val title = remember {
         mutableStateOf("Select Date")
     }
@@ -149,17 +131,13 @@ fun DatePicker(mDate: MutableState<String>) {
         }, mYear, mMonth, mDay
     )
 
-
     Button(
         modifier = Modifier
             .padding(vertical = 8.dp),
         onClick = {
             mDatePickerDialog.show()
-        },
-
-        ) {
+        }) {
         Row {
-
             Text(
                 text = title.value,
                 color = Color(R.color.white),
@@ -171,15 +149,10 @@ fun DatePicker(mDate: MutableState<String>) {
                 modifier = Modifier.padding(start = 5.dp)
             )
         }
-
-
     }
     if (mDate.value != "") {
         title.value = mDate.value
-
     }
-
-
 }
 
 @Composable
@@ -187,21 +160,15 @@ fun SimpleRadioButtonComponent(mselectedOption: MutableState<String>) {
     val radioOptions = listOf("Female", "Male")
     val (selectedOption, onOptionSelected) = remember { mutableStateOf("") }
 
-
     Row {
         radioOptions.forEach { text ->
             Row(
                 Modifier
-
                     .selectable(
-
                         selected = (text == selectedOption),
-
                         onClick = { onOptionSelected(text) }
                     )
-
             ) {
-
                 RadioButton(
                     selected = (text == selectedOption),
                     onClick = {
@@ -222,10 +189,7 @@ fun SimpleRadioButtonComponent(mselectedOption: MutableState<String>) {
 @Composable
 fun Switcher() {
     val mCheckedState = remember { mutableStateOf(false) }
-
-
     Row {
-
         Text(
             text = "Do you want to receive notification on gmail",
             Modifier.padding(top = 8.dp, end = 4.dp),
@@ -233,7 +197,6 @@ fun Switcher() {
             fontWeight = FontWeight.SemiBold
         )
         Switch(checked = mCheckedState.value, onCheckedChange = { mCheckedState.value = it })
-
     }
 }
 
@@ -246,7 +209,8 @@ fun LoginText() {
             color = Color(R.color.transparent),
             modifier = Modifier.padding(vertical = 16.dp, horizontal = 8.dp)
         )
-        Text(text = "Login",
+        Text(
+            text = "Login",
             color = Color(R.color.transparent),
             fontWeight = FontWeight.ExtraBold,
             modifier = Modifier
@@ -270,12 +234,7 @@ fun SignUpButton(
     password: MutableState<String>,
     confirmPassword: MutableState<String>
 ) {
-
     val mContext = LocalContext.current
-    Log.d(
-        "Signup Button",
-        "SignUpButton() called with: firstName = ${firstName.value}, lastName = ${lastName.value}, age = ${age.value}, email = ${email.value}, date = ${date.value}, gender = ${gender.value}, password = ${password.value}, confirmPassword = ${confirmPassword.value}"
-    )
     Button(
         onClick = {
             val emailPattern = "[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
@@ -283,8 +242,7 @@ fun SignUpButton(
                 "^(?=.*[a-z])(?=.*[A-Z])" + "(?=.*[@#$%^&+=])" + "(?=\\S+$).{8,20}$"
 
             val name = "^[a-zA-Z]+$"
-            val rgAge ="^[0-9]*$"
-
+            val rgAge = "^[0-9]*$"
 
             if (firstName.value == "" || lastName.value == "" || age.value == "" || email.value == "" || date.value == "" || gender.value == "") {
                 Toast.makeText(mContext, "Please enter all details", Toast.LENGTH_LONG).show()
@@ -300,7 +258,6 @@ fun SignUpButton(
             } else if (!(firstName.value.matches(name.toRegex())) || !(lastName.value.matches(name.toRegex()))) {
                 Toast.makeText(mContext, "Name should be character only", Toast.LENGTH_LONG).show()
             } else {
-
                 var isUserExists: Boolean = false
 
                 val db = DBHelper(mContext)
@@ -311,7 +268,6 @@ fun SignUpButton(
                             Log.d("TAG", "user esist")
                             isUserExists = true
                         } else {
-
                             val user = User(
                                 firstName.value,
                                 lastName.value,
@@ -322,20 +278,14 @@ fun SignUpButton(
                                 password.value
                             )
                             db.addUser(user)
-
-
                         }
-
                     }
                     withContext(Dispatchers.Main) {
                         delay(1000)
                         if (isUserExists == true) {
                             Toast.makeText(mContext, "User Already Exists", Toast.LENGTH_LONG)
                                 .show()
-
-                        }
-                        else {
-
+                        } else {
                             val intent = Intent(mContext, DetailsActivity::class.java).apply {
                                 putExtra("Email", email.value)
                             }
@@ -348,21 +298,15 @@ fun SignUpButton(
                             gender.value = "Birth Date"
                             password.value = ""
                             confirmPassword.value = ""
-
-
                         }
                     }
                 }
             }
-
-
         }, modifier = Modifier
             .padding(vertical = 8.dp)
     ) {
         Text(text = "Sign up", modifier = Modifier.padding(8.dp))
     }
-
-
 }
 
 @Preview(showBackground = true)

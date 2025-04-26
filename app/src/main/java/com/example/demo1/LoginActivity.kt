@@ -7,7 +7,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -36,21 +35,17 @@ class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         actionBar!!.title="Login"
-
         setContent {
             Demo1Theme {
-
-               Login()
+               DoLogin()
             }
         }
     }
 
-
     @Composable
-    fun Login() {
+    fun DoLogin() {
         val email = rememberSaveable { mutableStateOf("") }
         val password = rememberSaveable { mutableStateOf("") }
-
 
         Column(
             modifier = Modifier
@@ -59,22 +54,17 @@ class LoginActivity : ComponentActivity() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-
             EditText(title = "Email", KeyboardType.Email, email)
-
             EditText(title = "Password", KeyboardType.Password, password)
             LoginButton(
                 email, password
             )
-
-
         }
     }
 
     @Composable
     private fun LoginButton(email: MutableState<String>, password: MutableState<String>) {
         val mContext = LocalContext.current
-
         Button(
             onClick = {
                 val emailPattern = "^([\\w\\.\\-]+)@([\\w\\-]+)((\\.(\\w){2,3})+)$"
@@ -94,10 +84,7 @@ class LoginActivity : ComponentActivity() {
                     lifecycleScope.launch {
                         withContext(Dispatchers.IO) {
                             val db = DBHelper(mContext)
-
                             mlogin = db.isUserExists(email.value, password.value)
-                            Log.d("TAG", "LoginButton: " + mlogin)
-
                         }
                         withContext(Dispatchers.Main) {
                             if (!mlogin) {
@@ -106,18 +93,13 @@ class LoginActivity : ComponentActivity() {
                             } else {
                                 val mintent = Intent(mContext, DetailsActivity::class.java).apply {
                                     putExtra("Email", email.value)
-
                                 }
                                 startActivity(mintent)
                                 finish()
                             }
-
                         }
                     }
-
                 }
-
-
             }, modifier = Modifier
                 .padding(vertical = 16.dp)
         ) {
@@ -125,41 +107,20 @@ class LoginActivity : ComponentActivity() {
         }
     }
 
-
     @Composable
     fun EditText(title: String, keyboardType: KeyboardType, input: MutableState<String>) {
-
-
         OutlinedTextField(
             value = input.value,
             onValueChange = { input.value = it },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
-
             label =
             { Text(title) },
-
             keyboardOptions = KeyboardOptions(
                 keyboardType = keyboardType
             ),
             textStyle = TextStyle(color = Color.Gray)
-
         )
-
-
-    }
-
-
-    @Preview(showBackground = true)
-    @Composable
-    fun DefaultPreview2() {
-        Demo1Theme {
-            Login()
-        }
     }
 }
-
-
-
-
